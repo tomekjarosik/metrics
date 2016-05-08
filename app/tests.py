@@ -26,12 +26,17 @@ class AppTests(unittest.TestCase):
         return response
 
     def test_send_request_buildmetrics(self):
-        request_data = self.metricsender.prepare_request_data("testuser", {"t1" : 0, "t2" : 180}, True, None, None)
+        request_data = self.metricsender.prepare_request_data("testuser", 123123, 567678, {"t1" : 0, "t2" : 180},
+                                                              True, None, "testgitstatus", None)
         response = self._post(request_data)
         self.assertEquals(201, response.status_code)
 
     def test_get_list_of_all_metrics(self):
         response = self.client.get('/metrics')
+        self.assertEquals(200, response.status_code)
+
+    def test_get_detail_for_metric(self):
+        response = self.client.get('/metrics?mid=41')
         self.assertEquals(200, response.status_code)
 
     @unittest.skip("testing skipping")
@@ -52,14 +57,17 @@ class MetricSenderTests(unittest.TestCase):
         self.assertEquals(625, results['total time'])
 
     def test_prepare_request_data(self):
-        res = self.metricsender.prepare_request_data("testuser", {"t1" : 0, "t2" : 180}, True, None, None)
-        res["username"] = "an user"
-        res["scores"]["t2"] = 180
-        res["is_success"] = True
+        res = self.metricsender.prepare_request_data("testuser", 123123, 234234, {"t1" : 0, "t2" : 180},
+                                                     True, None, "testgitstatus", None)
+        self.assertEquals("testuser", res["username"])
+        self.assertEquals(180, res["scores"]["t2"])
+        self.assertEquals(True, res["is_success"])
+        self.assertEquals(123123, res["timestamp"])
+        self.assertEquals(234234, res["previous_timestamp"]);
 
     def test_send_request(self):
-        r = self.metricsender.send_request("testuser", {"t1": 13, "t10": 14}, True, "some diff", "some env")
-        self.assertEquals(200, r.status_code)
+        r = self.metricsender.send_request("testuser", 123123, 234234, {"t1": 13, "t10": 14}, True, "some diff", "gitstatus", "some env")
+        self.assertEquals(201, r.status_code)
 
 
 class FilesystemHelperTests(unittest.TestCase):
