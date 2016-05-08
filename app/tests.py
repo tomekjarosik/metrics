@@ -4,6 +4,8 @@ import unittest
 import filesystem_helper
 import metrics_sender
 from flask import json
+import utils
+
 
 class AppTests(unittest.TestCase):
     @classmethod
@@ -24,7 +26,7 @@ class AppTests(unittest.TestCase):
         return response
 
     def test_send_request_buildmetrics(self):
-        request_data = self.metricsender.prepare_request_data("an user", {"t1" : 0, "t2" : 180}, True, None, None)
+        request_data = self.metricsender.prepare_request_data("testuser", {"t1" : 0, "t2" : 180}, True, None, None)
         response = self._post(request_data)
         self.assertEquals(201, response.status_code)
 
@@ -36,6 +38,7 @@ class AppTests(unittest.TestCase):
     def test_empty_db(self):
         rv = self.app.get('/')
         assert 'No entries here so far' in rv.data
+
 
 class MetricSenderTests(unittest.TestCase):
     def setUp(self):
@@ -49,17 +52,17 @@ class MetricSenderTests(unittest.TestCase):
         self.assertEquals(625, results['total time'])
 
     def test_prepare_request_data(self):
-        res = self.metricsender.prepare_request_data("an user", {"t1" : 0, "t2" : 180}, True, None, None)
+        res = self.metricsender.prepare_request_data("testuser", {"t1" : 0, "t2" : 180}, True, None, None)
         res["username"] = "an user"
         res["scores"]["t2"] = 180
         res["is_success"] = True
 
     def test_send_request(self):
-        r = self.metricsender.send_request("tomek", {"t1": 13, "t10": 14}, True, "some diff", "some env")
+        r = self.metricsender.send_request("testuser", {"t1": 13, "t10": 14}, True, "some diff", "some env")
         self.assertEquals(200, r.status_code)
 
-class FilesystemHelperTests(unittest.TestCase):
 
+class FilesystemHelperTests(unittest.TestCase):
     def setUp(self):
         self.helper = filesystem_helper.FilesystemHelper()
         pass
@@ -95,8 +98,8 @@ class FilesystemHelperTests(unittest.TestCase):
         res = self.helper.git_status()
         self.assertTrue(res.startswith("# On branch master"))
 
-class PlatformInfoTest(unittest.TestCase):
 
+class PlatformInfoTest(unittest.TestCase):
     def setUp(self):
         from utils import PlatformInfo
         self.info = PlatformInfo().info()
@@ -104,6 +107,19 @@ class PlatformInfoTest(unittest.TestCase):
     def test_platform_info(self):
         self.assertIsNotNone(self.info["machine"])
         self.assertIsNotNone(self.info["user"])
+
+class CustomSorterTest(unittest.TestCase):
+    def setUp(self):
+        self.customsorter = utils.CustomSorter()
+        pass
+
+    def test_sort_scores(self):
+        dict = {}
+        for i in range(0, 10):
+            dict["t"+str(i)] = i * (i % 3)
+        actual = self.customsorter.sort_scores(dict, True)
+        expected = [('t8', 16), ('t5', 10), ('t7',7), ('t4', 4), ('t2', 4), ('t1', 1), ('t9', 0), ('t6', 0), ('t3', 0), ('t0', 0)]
+        self.assertEquals(expected, actual)
 
 if __name__ == '__main__':
     unittest.main()

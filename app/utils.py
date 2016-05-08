@@ -15,3 +15,11 @@ class PlatformInfo(object):
 
     def username(self):
         return getpass.getuser()
+
+
+class CustomSorter(object):
+    @staticmethod
+    def sort_scores(scores_dict, filter_total_time=True):
+        if filter_total_time:
+            scores_dict = filter(lambda x: x[0] != "total time", scores_dict.items())
+        return list(sorted(scores_dict, key=lambda x: -x[1]))

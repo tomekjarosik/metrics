@@ -4,6 +4,7 @@ from flask import flash, redirect
 from .forms import LoginForm
 from flask import request, abort
 from flask import jsonify, json
+from utils import CustomSorter
 
 from redis import Redis
 
@@ -55,6 +56,8 @@ def show_metrics():
     metrics = []
     for id in metrics_ids:
         metric_data = json.loads(r_server.get("metric.id."+str(id)))
+        if metric_data["scores"]:
+            metric_data["top_3_tasks"] = CustomSorter.sort_scores(metric_data["scores"])[:3]
         metrics.append(metric_data)
 
     return render_template('metrics_list.html', metrics = metrics)

@@ -6,12 +6,18 @@
   <tr>
     <td>User</td>
     <td>Total time</td>
+    <td>Top 3 tasks</td>
     <td>Diff</td>
   </tr>
 {% for value in metrics %}
    <tr>
         <th> {{ value.username }} </th>
        <td> {{ value.scores['total time'] }}ms </td>
+       <td>
+           {% for task in value.top_3_tasks %}
+           {{ task[1] }}ms&nbsp;{{ task[0] }}
+           {% endfor %}
+       </td>
         <td> {{ value.diff }} </td>
    </tr>
 {% endfor %}
