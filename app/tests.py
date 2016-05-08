@@ -22,7 +22,7 @@ class AppTests(unittest.TestCase):
 
     def _post(self, a_dict):
         response = self.client.post('/buildmetrics/api/v1.0/add',
-            data=json.dumps(a_dict), content_type = 'application/json')
+                                    data=json.dumps(a_dict), content_type='application/json')
         return response
 
     def test_send_request_buildmetrics(self):
@@ -63,7 +63,7 @@ class MetricSenderTests(unittest.TestCase):
         self.assertEquals(180, res["scores"]["t2"])
         self.assertEquals(True, res["is_success"])
         self.assertEquals(123123, res["timestamp"])
-        self.assertEquals(234234, res["previous_timestamp"]);
+        self.assertEquals(234234, res["previous_timestamp"])
 
     def test_send_request(self):
         r = self.metricsender.send_request("testuser", 123123, 234234, {"t1": 13, "t10": 14}, True, "some diff", "gitstatus", "some env")
@@ -122,10 +122,10 @@ class CustomSorterTest(unittest.TestCase):
         pass
 
     def test_sort_scores(self):
-        dict = {}
+        a_dict = {}
         for i in range(0, 10):
-            dict["t"+str(i)] = i * (i % 3)
-        actual = self.customsorter.sort_scores(dict, True)
+            a_dict["t"+str(i)] = i * (i % 3)
+        actual = self.customsorter.sort_scores(a_dict, True)
         expected = [('t8', 16), ('t5', 10), ('t7',7), ('t4', 4), ('t2', 4), ('t1', 1), ('t9', 0), ('t6', 0), ('t3', 0), ('t0', 0)]
         self.assertEquals(expected, actual)
 

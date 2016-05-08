@@ -2,16 +2,18 @@ import platform
 import getpass
 import datetime
 
+
 class PlatformInfo(object):
     def info(self):
-        res = {}
-        res["machine"] = platform.machine()
-        res["version"] = platform.version()
-        res["platform"] = platform.platform()
-        res["uname"] = platform.uname()
-        res["cpu"] = platform.processor()
-        res["java_ver"] = platform.java_ver()
-        res["user"] = getpass.getuser()
+        res = {
+            "machine": platform.machine(),
+            "version": platform.version(),
+            "platform": platform.platform(),
+            "uname": platform.uname(),
+            "cpu": platform.processor(),
+            "java_ver": platform.java_ver(),
+            "user": getpass.getuser()
+        }
         return res
 
     def username(self):
@@ -29,8 +31,10 @@ class CustomSorter(object):
 def format_timestamp(timestamp):
     return datetime.datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S')
 
+
 def timediff(t1, t2):
     return str(datetime.datetime.fromtimestamp(t1) - datetime.datetime.fromtimestamp(t2))
+
 
 def listdiff(first, second):
     second = set(second)

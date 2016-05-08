@@ -4,3 +4,6 @@ pip install Flask-WTF
 pip install flask-sqlalchemy
 pip install sqlalchemy-migrate
 pip install requests
+
+add below line to your main build.gradle:
+apply from: "com.tjarosik.timinglistener.gradle"

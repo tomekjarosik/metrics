@@ -8,10 +8,13 @@ import json
 import zlib
 import datetime
 
+
 class MetricSender(object):
     ADD_METRIC_URL = "http://127.0.0.1:5000/buildmetrics/api/v1.0/add"
+
     def __init__(self):
         pass
+
     def parse_build_times(self, filepath):
         results = {}
         with open(filepath) as f:
@@ -22,14 +25,14 @@ class MetricSender(object):
 
     def prepare_request_data(self, username, timestamp, previous_timestamp, scores, is_success, diff, gitstatus, env):
         result = {
-            "username" : username,
-            "scores" : scores,
+            "username": username,
+            "scores": scores,
             "timestamp" : timestamp,
             "previous_timestamp" : previous_timestamp,
-            "is_success" : is_success,
-            "diff" : diff,
-            "gitstatus" : gitstatus,
-            "env" : env}
+            "is_success": is_success,
+            "diff": diff,
+            "gitstatus": gitstatus,
+            "env": env}
         return result
 
     def send_request(self, username, timestamp, previous_timestamp, scores, is_success, diff, gitstatus, env):
@@ -67,10 +70,10 @@ if __name__ == '__main__':
     req = sender.send_request(platformInfo.username(),
                               args.timestamp / 1000L,
                               last_build_time,
-                        sender.parse_build_times(args.current),
-                        True,
-                        diff,
-                        filesystemHelper.git_status(),
-                        platformInfo.info())
+                              sender.parse_build_times(args.current),
+                              True,
+                              diff,
+                              filesystemHelper.git_status(),
+                              platformInfo.info())
 
     print ("Stats sent with status {0}".format(req.status_code))

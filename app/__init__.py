@@ -5,6 +5,7 @@ import redis
 app = Flask(__name__)
 app.config.from_object('config')
 
+# SQLAlchamy is not used in current version, Redis server is used instead
 db = SQLAlchemy(app)
 r_server = redis.Redis()
 

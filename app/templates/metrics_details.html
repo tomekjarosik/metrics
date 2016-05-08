@@ -22,19 +22,25 @@
 </table>
 <br>
 <p>
-    Tasks:<br>
+    <h3>Tasks:<br></h3>
    {% for task in metric.top_tasks %}
    {{ task[1] }}ms&nbsp;{{ task[0] }} <br>
    {% endfor %}
 </p>
-Git status for current metric:
+<h3>Git status for current metric:</h3>
 <pre>
     {{ metric.gitstatus }}
 </pre>
 <p>
-    List of files changed since last compilation:<br><br>
+    <h3>List of files changed since last compilation:</h3>
     {% for filename in metric.diff_sorted %}
            {{ filename }} <br>
     {% endfor %}
+</p>
+<p>
+    <h3>Environment: <br></h3>
+   {% for env_entry in metric.env.items() %}
+   {{ env_entry[0] }}  {{ env_entry[1] }} <br>
+   {% endfor %}
 </p>
 {% endblock %}

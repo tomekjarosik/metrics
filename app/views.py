@@ -6,23 +6,16 @@ from flask import request, abort
 from flask import jsonify, json
 from utils import CustomSorter
 import utils
+import redis
 import zlib
 
-from redis import Redis
-
-@app.route('/')
-@app.route('/index')
-def index():
-    user = {'nickname': 'Tomek'}  # fake user
-    return render_template('index.html',
-                           title='Home',
-                           user=user)
 
 @app.route('/charts')
 def charts_demo():
     # fake chart
     #user = {'nickname': 'Tomek'}  # fake user
     return render_template('charts.html')
+
 
 @app.route('/buildmetrics/api/v1.0/add', methods=['POST'])
 def add_build_metrics():
@@ -31,6 +24,7 @@ def add_build_metrics():
         abort(400)
 
     request_data = None
+    username = "unset"
     try:
         request_data = request.json
         username = request_data["username"]
@@ -49,8 +43,10 @@ def add_build_metrics():
 def sort_filelist_by_ext_relevance(filelist):
     res = []
     exts = [".java", ".cpp", ".gradle"]
+    res += ["<distinguished files>"]
     for ext in exts:
         res += filter(lambda x: x.strip().endswith(ext), filelist)
+    res += ["<other files below>"]
     res += utils.listdiff(filelist, res)
     return res
 
@@ -70,14 +66,15 @@ def transform_metric_data(metric_data, task_cnt=3):
     return metric_data
 
 @app.route('/metrics', methods=['GET'])
+@app.route('/index', methods=['GET'])
 def show_metrics():
     # get username from query string
     # username = request.args.get('username')
-    if (request.args.get("mid")):
+    if request.args.get("mid"):
         return show_metric_id(request.args.get("mid"))
 
     metrics_ids = []
-    if (request.args.get('username')):
+    if request.args.get('username'):
         username = request.args.get('username')
         fieldname = "username." + username + ".metric_ids"
         metrics_ids = r_server.lrange(fieldname, 0, -1)
@@ -86,13 +83,13 @@ def show_metrics():
         metrics_ids = range(1, max_metric_id)
 
     metrics = []
-    for id in metrics_ids:
-        metric_data = json.loads(r_server.get("metric.id."+str(id)))
+    for mid in metrics_ids:
+        metric_data = json.loads(r_server.get("metric.id."+str(mid)))
         metric_data = transform_metric_data(metric_data)
-        metric_data["mid"] = id
+        metric_data["mid"] = mid
         metrics.append(metric_data)
 
-    return render_template('metrics_list.html', metrics = metrics)
+    return render_template('metrics_list.html', metrics=metrics)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -105,3 +102,4 @@ def login():
                            title='Sign In',
                            form=form,
                            providers=app.config['OPENID_PROVIDERS'])
+
