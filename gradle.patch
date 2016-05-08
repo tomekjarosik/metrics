@@ -56,15 +56,20 @@ class TimingsListener implements TaskExecutionListener, BuildListener {
 }
 
 gradle.buildFinished {
-    println "buildFinished aaa"
-    def f1 = new File('build.times')
-    f1.delete()
-    f1 << timing_listener.result_str
-    def metrics_path = new File("./metrics.py").absolutePath
+    def previous_file = new File('build.times')
+    previous_file.renameTo("build.times.old")
+    previous_file = new File("build.times.old")
+    def current_file = new File("build.times")
+    current_file << timing_listener.result_str
+    def working_dir = new File(".").absolutePath
+    def metrics_path = new File("../python-flask/metrics_sender.py").absolutePath
     println(metrics_path)
     exec {
         workingDir '.'
-        commandLine "python.exe", metrics_path
+        commandLine "python.exe", metrics_path,
+                "--root-dir", working_dir,
+                "--current", current_file.absolutePath,
+                "--previous", previous_file.absolutePath
     }
     println "DONE!"
 }
