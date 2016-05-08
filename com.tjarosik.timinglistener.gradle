@@ -1,0 +1,79 @@
+def clock_project = new org.gradle.util.Clock()
+def timing_listener = new TimingsListener(clock_project)
+gradle.addListener timing_listener
+
+// Log timings per task.
+class TimingsListener implements TaskExecutionListener, BuildListener {
+    private Clock clock_task
+    private Clock clock_project
+    private timings = []
+    public result_str
+
+    public TimingsListener(Clock clockProject) {
+        this.clock_project = clockProject
+    }
+
+    @Override
+    void beforeExecute(Task task) {
+        clock_task = new org.gradle.util.Clock()
+    }
+
+    @Override
+    void afterExecute(Task task, TaskState taskState) {
+        def ms = clock_task.timeInMs
+        timings.add([ms, task.path])
+        task.project.logger.warn "${task.path} took ${ms}ms"
+    }
+
+    @Override
+    void buildStarted(Gradle gradle) {}
+
+    @Override
+    void buildFinished(BuildResult result) {
+        def ms = clock_project.timeInMs
+        printf "Total time: %7s\n", ms
+        def sb = StringBuilder.newInstance()
+        sb << sprintf("%7s, total time\n", ms)
+
+        println "Task timings:"
+        for (timing in timings) {
+            if (timing[0] >= 50) {
+                printf "%7sms  %s\n", timing
+            }
+            sb << sprintf("%7s, %s\n", timing)
+        }
+        result_str = sb.toString()
+    }
+
+    @Override
+    void projectsEvaluated(Gradle gradle) {}
+
+    @Override
+    void projectsLoaded(Gradle gradle) {}
+
+    @Override
+    void settingsEvaluated(Settings settings) {}
+}
+
+gradle.buildFinished {
+    def build_times_file = new File('build.times')
+    def previous_timestamp = build_times_file.lastModified()
+
+    // recreate the file
+    build_times_file.delete()
+    build_times_file = new File('build.times')
+    build_times_file << timing_listener.result_str
+
+    def working_dir = new File(".").absolutePath
+    def metrics_path = new File("../python-flask/app/metrics_sender.py").absolutePath
+    println(metrics_path)
+    exec {
+        workingDir '.'
+        commandLine "python.exe", metrics_path,
+                "--root_dir", working_dir,
+                "--current", build_times_file.absolutePath,
+                "--timestamp", build_times_file.lastModified(),
+                "--previous_timestamp", previous_timestamp
+    }
+    println "DONE!"
+}

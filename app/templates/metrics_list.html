@@ -1,0 +1,29 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<table style="width:100%">
+  <tr>
+    <td>User</td>
+    <td>Timestamp</td>
+    <td>Since last build</td>
+    <td>Total time</td>
+    <td>Top 3 tasks</td>
+    <td>Diff</td>
+  </tr>
+{% for value in metrics %}
+   <tr>
+        <th> {{ value.username }} </th>
+       <td> <small> {{ value.timestamp_formatted}}</small> </td>
+       <td> <small>{{ value.time_diff }} </small></td>
+       <td> {{ value.scores['total time'] }}ms </td>
+       <td>
+           {% for task in value.top_tasks %}
+           {{ task[1] }}ms&nbsp;{{ task[0] }}<br>
+           {% endfor %}
+       </td>
+       <td><a href="/metrics?mid={{ value.mid }}">details</a></td>
+   </tr>
+{% endfor %}
+</table>
+{% endblock %}

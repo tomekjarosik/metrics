@@ -1,0 +1,46 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<table style="width:100%">
+  <tr>
+    <td>User</td>
+    <td>Timestamp</td>
+    <td>Since last build</td>
+    <td>Total time</td>
+  </tr>
+
+   <tr>
+        <th> {{ metric.username }} </th>
+       <td> <small> {{ metric.timestamp_formatted}}</small> </td>
+       <td> <small>{{ metric.time_diff }} </small></td>
+       <td> {{ metric.scores['total time'] }}ms </td>
+       <td>
+
+       </td>
+   </tr>
+</table>
+<br>
+<p>
+    <h3>Tasks:<br></h3>
+   {% for task in metric.top_tasks %}
+   {{ task[1] }}ms&nbsp;{{ task[0] }} <br>
+   {% endfor %}
+</p>
+<h3>Git status for current metric:</h3>
+<pre>
+    {{ metric.gitstatus }}
+</pre>
+<p>
+    <h3>List of files changed since last compilation:</h3>
+    {% for filename in metric.diff_sorted %}
+           {{ filename }} <br>
+    {% endfor %}
+</p>
+<p>
+    <h3>Environment: <br></h3>
+   {% for env_entry in metric.env.items() %}
+   {{ env_entry[0] }}  {{ env_entry[1] }} <br>
+   {% endfor %}
+</p>
+{% endblock %}
