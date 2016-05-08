@@ -1,6 +1,8 @@
 # Metrics
 
-Metrics is a tiny project which helps you with measuring compilatio build times in Android Studio across multiple users. It provides information about times for each task and total time, build timestamp, files that has changed since last compilation, git status or more data about machine the build was running.
+Metrics is a tiny project which helps you with measuring compilation times in Android Studio across multiple users.
+It provides information about times for each task and total time, build timestamp, files that have changed since last compilation,
+git status or more data about machine the build was running.
 
 Short video:
 https://www.youtube.com/watch?v=Ta81WhmaTC8
