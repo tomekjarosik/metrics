@@ -28,6 +28,10 @@ class AppTests(unittest.TestCase):
         response = self._post(request_data)
         self.assertEquals(201, response.status_code)
 
+    def test_get_list_of_all_metrics(self):
+        response = self.client.get('/metrics')
+        self.assertEquals(200, response.status_code)
+
     @unittest.skip("testing skipping")
     def test_empty_db(self):
         rv = self.app.get('/')

@@ -1,9 +1,11 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import zlib
+import redis
 app = Flask(__name__)
 app.config.from_object('config')
 
 db = SQLAlchemy(app)
+r_server = redis.Redis()
 
 from app import views, models

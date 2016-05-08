@@ -1,0 +1,14 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<table>
+{% for value in metrics %}
+   <tr>
+        <th> {{ value.username }} </th>
+       <td> {{ value.scores['total time'] }} </td>
+        <td> {{ value }} </td>
+   </tr>
+{% endfor %}
+</table>
+{% endblock %}
