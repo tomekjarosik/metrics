@@ -1,0 +1,48 @@
+ <html>
+    <head>
+		<!--<script type="text/javascript" src="https://raw.githubusercontent.com/nnnick/Chart.js/v2.0-dev/dist/Chart.bundle.js"></script> -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+		<!-- <script src="Chart.bundle.js"></script> -->
+          <!--other script and also external css included over here-->
+		  
+		  <script type="text/javascript">
+			$.getScript( "https://cdn.rawgit.com/nnnick/Chart.js/v2.0-dev/dist/Chart.bundle.js", function( data, textStatus, jqxhr ) {
+			  // console.log( data ); // Data returned
+			  //console.log( textStatus ); // Success
+			  //console.log( jqxhr.status ); // 200
+			  //console.log( "Load was performed." );
+			});
+		  
+			function loadChart() {
+				var ctx = document.getElementById("myChart");
+				var myChart = new Chart(ctx, {
+					type: 'bar',
+					data: {
+						labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+						datasets: [{
+							label: '# of Votes',
+							data: [12, 19, 3, 5, 2, 3]
+						}]
+					},
+					options: {
+						scales: {
+							yAxes: [{
+								ticks: {
+									beginAtZero:true
+								}
+							}]
+						}
+					}
+				});
+			}
+			window.onload = loadChart;
+			</script>
+    </head>
+    <body>
+	Hello charts!
+        <canvas id="myChart" width="200" height="200"></canvas>
+    </body>
+    </html>
+
+
+
