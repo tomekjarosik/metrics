@@ -12,3 +12,6 @@ class PlatformInfo(object):
         res["java_ver"] = platform.java_ver()
         res["user"] = getpass.getuser()
         return res
+
+    def username(self):
+        return getpass.getuser()

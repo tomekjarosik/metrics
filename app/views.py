@@ -26,21 +26,34 @@ def add_build_metrics():
     print("Received request: ", request.json)
     if not request.json or not 'scores' in request.json:
         abort(400)
-    request_data = request.json
-    username = request_data["username"]
+    request_data = None
+    try:
+        request_data = request.json
+        username = request_data["username"]
+    except:
+        request_data = json.loads(request.json)
+        username = request_data["username"]
+
     metric_id = r_server.incr("metric.id")
     r_server.set("metric.id."+str(metric_id), json.dumps(request_data))
-    r_server.rpush(username, metric_id)
+    r_server.rpush("username." + username + ".metric_ids", metric_id)
     return jsonify({'params': request_data}), 201
 
 @app.route('/metrics', methods=['GET'])
-def show_builds():
+def show_metrics():
     # get username from query string
     # username = request.args.get('username')
+    metrics_ids = []
+    if (request.args.get('username')):
+        username = request.args.get('username')
+        fieldname = "username." + username + ".metric_ids"
+        metrics_ids = r_server.lrange(fieldname, 0, -1)
+    else:
+        max_metric_id = int(r_server.get("metric.id"))
+        metrics_ids = range(1, max_metric_id)
 
-    max_metric_id = int(r_server.get("metric.id"))
     metrics = []
-    for id in range(1, max_metric_id):
+    for id in metrics_ids:
         metric_data = json.loads(r_server.get("metric.id."+str(id)))
         metrics.append(metric_data)
 

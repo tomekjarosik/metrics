@@ -2,6 +2,7 @@
 import datetime as dt
 import os
 import subprocess
+import datetime
 
 class FilesystemHelper(object):
     def files_modified_since(self, dirpath, ago):
@@ -21,3 +22,6 @@ class FilesystemHelper(object):
         proc = subprocess.Popen(["git", "status"], stdout=subprocess.PIPE, shell=True)
         (out, err) = proc.communicate()
         return out
+
+    def get_file_creation_time(self, path):
+        return datetime.datetime.fromtimestamp(os.path.getctime(path))

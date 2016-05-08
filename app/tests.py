@@ -24,7 +24,7 @@ class AppTests(unittest.TestCase):
         return response
 
     def test_send_request_buildmetrics(self):
-        request_data = self.metricsender.prepare_request("an user", {"t1" : 0, "t2" : 180}, True, None, None)
+        request_data = self.metricsender.prepare_request_data("an user", {"t1" : 0, "t2" : 180}, True, None, None)
         response = self._post(request_data)
         self.assertEquals(201, response.status_code)
 
@@ -48,11 +48,15 @@ class MetricSenderTests(unittest.TestCase):
         self.assertEquals(0, results[':app:preDebugBuild'])
         self.assertEquals(625, results['total time'])
 
-    def test_prepare_request(self):
-        res = self.metricsender.prepare_request("an user", {"t1" : 0, "t2" : 180}, True, None, None)
+    def test_prepare_request_data(self):
+        res = self.metricsender.prepare_request_data("an user", {"t1" : 0, "t2" : 180}, True, None, None)
         res["username"] = "an user"
         res["scores"]["t2"] = 180
         res["is_success"] = True
+
+    def test_send_request(self):
+        r = self.metricsender.send_request("tomek", {"t1": 13, "t10": 14}, True, "some diff", "some env")
+        self.assertEquals(200, r.status_code)
 
 class FilesystemHelperTests(unittest.TestCase):
 

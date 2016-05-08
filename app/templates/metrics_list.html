@@ -2,12 +2,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-<table>
+<table style="width:100%">
+  <tr>
+    <td>User</td>
+    <td>Total time</td>
+    <td>Diff</td>
+  </tr>
 {% for value in metrics %}
    <tr>
         <th> {{ value.username }} </th>
-       <td> {{ value.scores['total time'] }} </td>
-        <td> {{ value }} </td>
+       <td> {{ value.scores['total time'] }}ms </td>
+        <td> {{ value.diff }} </td>
    </tr>
 {% endfor %}
 </table>
