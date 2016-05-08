@@ -2,7 +2,8 @@ from app import app
 from flask import render_template
 from flask import flash, redirect
 from .forms import LoginForm
-
+from flask import request, abort
+from flask import jsonify, json
 
 @app.route('/')
 @app.route('/index')
@@ -18,7 +19,13 @@ def charts_demo():
     #user = {'nickname': 'Tomek'}  # fake user
     return render_template('charts.html')
 
-
+@app.route('/buildmetrics/api/v1.0/add', methods=['POST'])
+def add_build_metrics():
+    print("Received request: ", request.json)
+    if not request.json or not 'scores' in request.json:
+        abort(400)
+    a_dict = request.json
+    return jsonify({'params': a_dict}), 201
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

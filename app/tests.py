@@ -2,24 +2,53 @@ import os
 import app
 import unittest
 import filesystem_helper
+import metrics_sender
+from flask import json
 
 class AppTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.client = app.app.test_client()
+
     def setUp(self):
-        app.app.config['TESTING'] = True
-        self.app = app.app.test_client()
+        self.app_context = app.app.app_context()
+        self.app_context.push()
+        self.metricsender = metrics_sender.MetricSender()
 
     def tearDown(self):
-        pass
+        self.app_context.pop()
 
-    def test_send_request(self):
-        return self.app.post('/login', data=dict(
-            username="aaa",
-            password="bbb"
-        ), follow_redirects=True)
+    def _post(self, a_dict):
+        response = self.client.post('/buildmetrics/api/v1.0/add',
+            data=json.dumps(a_dict), content_type = 'application/json')
+        return response
 
+    def test_send_request_buildmetrics(self):
+        request_data = self.metricsender.prepare_request("an user", {"t1" : 0, "t2" : 180}, True, None, None)
+        response = self._post(request_data)
+        self.assertEquals(201, response.status_code)
+
+    @unittest.skip("testing skipping")
     def test_empty_db(self):
         rv = self.app.get('/')
         assert 'No entries here so far' in rv.data
+
+class MetricSenderTests(unittest.TestCase):
+    def setUp(self):
+        self.metricsender = metrics_sender.MetricSender()
+
+    def test_parse_build_times(self):
+        results = self.metricsender.parse_build_times("tests/build.times.in")
+        self.assertEquals(2, results[':app:buildInfoDebugLoader'])
+        self.assertEquals(187, results[':app:preBuild'])
+        self.assertEquals(0, results[':app:preDebugBuild'])
+        self.assertEquals(625, results['total time'])
+
+    def test_prepare_request(self):
+        res = self.metricsender.prepare_request("an user", {"t1" : 0, "t2" : 180}, True, None, None)
+        res["username"] = "an user"
+        res["scores"]["t2"] = 180
+        res["is_success"] = True
 
 class FilesystemHelperTests(unittest.TestCase):
 
@@ -35,17 +64,17 @@ class FilesystemHelperTests(unittest.TestCase):
         names = ["_t1.txt", "_t2.txt"]
         root = "."
         f1 = open(names[0], "w")
-        result = self.helper.files_modified_since(root, dt.datetime.now() - dt.timedelta(seconds=1))
+        result = self.helper.files_modified_since(root, dt.datetime.now() - dt.timedelta(seconds=0.51))
         self.assertEquals(os.path.join(root, names[0]), result[0])
         self.assertEquals(1, result.__len__())
-        time.sleep(0.5)
+        time.sleep(0.25)
         f2 = open(names[1], "w")
-        result = self.helper.files_modified_since(root, dt.datetime.now() - dt.timedelta(seconds=1))
+        result = self.helper.files_modified_since(root, dt.datetime.now() - dt.timedelta(seconds=0.5))
         self.assertEquals(os.path.join(root, names[1]), result[1])
         self.assertEquals(2, result.__len__())
 
-        time.sleep(0.7)
-        result = self.helper.files_modified_since(root, dt.datetime.now() - dt.timedelta(seconds=1))
+        time.sleep(0.35)
+        result = self.helper.files_modified_since(root, dt.datetime.now() - dt.timedelta(seconds=0.5))
         self.assertEquals(os.path.join(root, names[1]), result[0])
         self.assertEquals(1, result.__len__())
 
